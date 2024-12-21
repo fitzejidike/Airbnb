@@ -7,5 +7,7 @@ import lombok.Setter;
 @Setter
 public class Bookings {
     private Long id;
+    private Long propertyId;
+
     
 }
