@@ -5,14 +5,12 @@ import com.example.airbnb.data.repository.UserRepository;
 import com.example.airbnb.dtos.request.RegisterUserRequest;
 import com.example.airbnb.dtos.responses.RegisterUserResponse;
 import com.example.airbnb.exception.UserAlreadyExistsException;
-import com.example.airbnb.services.serviceUtils.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;

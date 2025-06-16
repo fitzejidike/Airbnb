@@ -2,7 +2,7 @@ package com.example.airbnb.Controller;
 
 import com.example.airbnb.dtos.request.RegisterUserRequest;
 import com.example.airbnb.dtos.responses.ApiResponse;
-import com.example.airbnb.services.serviceUtils.UserService;
+import com.example.airbnb.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
