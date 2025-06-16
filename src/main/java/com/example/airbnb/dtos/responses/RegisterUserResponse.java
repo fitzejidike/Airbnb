@@ -1,10 +1,12 @@
 package com.example.airbnb.dtos.responses;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterUserResponse {
 private String message;
 private String username;

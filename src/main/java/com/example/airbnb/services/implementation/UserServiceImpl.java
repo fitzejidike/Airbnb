@@ -8,50 +8,83 @@ import com.example.airbnb.exception.InvalidEmailFoundException;
 import com.example.airbnb.exception.InvalidPasswordException;
 import com.example.airbnb.exception.UserAlreadyExistsException;
 import com.example.airbnb.services.serviceUtils.UserService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Pattern;
+
 @Service
-@AllArgsConstructor
-public class UserServiceImpl  implements UserService {
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+
+
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+
+    private static final Pattern ALPHANUMERIC_PATTERN =
+            Pattern.compile("^[a-zA-Z0-9]*$");
 
     @Override
     public RegisterUserResponse register(RegisterUserRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("A user with this email already exists");
-        }
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new UserAlreadyExistsException("A user with this username already exists");
-        }
+        checkIfUserExists(request.getEmail(), request.getUsername());
+        validateEmailFormat(request.getEmail());
+        validatePasswordStrength(request.getPassword());
 
-        validateEmail(request.getEmail());
-        validatePassword(request.getPassword());
-        User user = new User();
-        user.setName(request.getName());
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        user.setEmail(request.getEmail());
+        User user = createUserFromRequest(request);
         userRepository.save(user);
-        RegisterUserResponse response = new RegisterUserResponse();
-        response.setUsername(user.getUsername());
-        response.setMessage("User registered successfully");
-        return response;
+
+        return buildRegistrationResponse(user);
     }
-    private void validateEmail(String email) {
-        if (!email.matches( "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new InvalidEmailFoundException("Invalid Email");
+
+    private void checkIfUserExists(String email, String username) {
+        userRepository.findByEmail(email).ifPresent(u -> {
+            throw new UserAlreadyExistsException("A user with this email already exists");
+        });
+
+        userRepository.findByUsername(username).ifPresent(u -> {
+            throw new UserAlreadyExistsException("A user with this username already exists");
+        });
+    }
+
+    private void validateEmailFormat(String email) {
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new InvalidEmailFoundException("Invalid email format");
         }
     }
-    private static  void validatePassword(String password) {
+
+    private void validatePasswordStrength(String password) {
         if (password.length() < 8) {
-            throw new InvalidPasswordException("Password must contain at least 8 characters");
+            throw new InvalidPasswordException("Password must be at least 8 characters long");
         }
-        if (!password.matches("[a-zA-Z0-9]*")) {
+        if (!ALPHANUMERIC_PATTERN.matcher(password).matches()) {
             throw new InvalidPasswordException("Password must be alphanumeric");
         }
         if (!password.matches(".*\\d.*")) {
             throw new InvalidPasswordException("Password must contain at least one digit");
         }
+    }
+
+    private User createUserFromRequest(RegisterUserRequest request) {
+        return User.builder()
+                .name(request.getName())
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword())) // secure hashing
+                .build();
+    }
+
+    private RegisterUserResponse buildRegistrationResponse(User user) {
+        return RegisterUserResponse.builder()
+                .username(user.getUsername())
+                .message("User registered successfully")
+                .build();
     }
 }
