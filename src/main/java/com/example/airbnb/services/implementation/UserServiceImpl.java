@@ -11,6 +11,7 @@ import com.example.airbnb.exception.UserNotFoundException;
 import com.example.airbnb.services.serviceUtils.InputValidators;
 import com.example.airbnb.services.serviceUtils.UserMapper;
 import com.example.airbnb.services.UserService;
+import com.example.airbnb.services.serviceUtils.UserValidators;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,14 +32,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RegisterUserResponse register(RegisterUserRequest request) {
-        checkIfUserExists(request.getEmail(), request.getUsername());
+        UserValidators.checkIfUserExists(userRepository, request.getEmail(), request.getUsername());
        InputValidators.validateEmail(request.getEmail());
        InputValidators.validatePassword(request.getPassword());
 
-        User user = createUserFromRequest(request);
-        userRepository.save(user);
+        User user = UserMapper.createUserFromRegisterRequest(
+                request,
+                passwordEncoder.encode(request.getPassword())
+        );
 
-        return buildRegistrationResponse(user);
+        return UserMapper.toRegisterResponse(user);
     }
 
 
@@ -72,38 +75,6 @@ public class UserServiceImpl implements UserService {
 
         return UserMapper.toResponseDTO(userRepository.save(user));
 
-    }
-
-
-
-
-    private void checkIfUserExists(String email, String username) {
-        userRepository.findByEmail(email).ifPresent(u -> {
-            throw new UserAlreadyExistsException("A user with this email already exists");
-        });
-
-        userRepository.findByUsername(username).ifPresent(u -> {
-            throw new UserAlreadyExistsException("A user with this username already exists");
-        });
-    }
-
-
-
-
-    private User createUserFromRequest(RegisterUserRequest request) {
-        return User.builder()
-                .name(request.getName())
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword())) // secure hashing
-                .build();
-    }
-
-    private RegisterUserResponse buildRegistrationResponse(User user) {
-        return RegisterUserResponse.builder()
-                .username(user.getUsername())
-                .message("User registered successfully")
-                .build();
     }
 
 
