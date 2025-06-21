@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterUserResponse {
+    private Long id;
 private String message;
 private String username;
 }

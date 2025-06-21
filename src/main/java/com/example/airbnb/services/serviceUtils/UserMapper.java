@@ -17,6 +17,7 @@ public class UserMapper {
 
     public static RegisterUserResponse toRegisterResponse(User user) {
         return RegisterUserResponse.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .message("User registered successfully")
                 .build();

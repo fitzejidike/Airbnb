@@ -1,13 +1,14 @@
 package com.example.airbnb.dtos.responses;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
-public class ApiResponse {
-    private Object data;
-    private Boolean status;
+@Builder
+public class ApiResponse<T> {
+    private T data;
+    private boolean success;
+    private String message;
 }
