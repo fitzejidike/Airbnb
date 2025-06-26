@@ -37,6 +37,7 @@ public class User {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime timeUpdated;
 
+    @Builder.Default
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Property> properties = new ArrayList<>();
 
