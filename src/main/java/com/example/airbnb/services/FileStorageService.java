@@ -1,4 +1,7 @@
 package com.example.airbnb.services;
 
-public class FileStorageService {
+import org.springframework.web.multipart.MultipartFile;
+
+public interface FileStorageService {
+    String saveImage(MultipartFile image);
 }

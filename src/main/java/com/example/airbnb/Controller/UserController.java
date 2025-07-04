@@ -7,44 +7,49 @@ import com.example.airbnb.dtos.responses.RegisterUserResponse;
 import com.example.airbnb.dtos.responses.UserResponseDTO;
 import com.example.airbnb.services.UserService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.CREATED;
+import lombok.RequiredArgsConstructor;
+
+
+import org.springframework.data.domain.Pageable;
 
 @RestController
-@RequestMapping("api/v1/user")
-@AllArgsConstructor
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterUserResponse>> register(
-            @Valid @RequestBody RegisterUserRequest registerUserRequest
-    ) {
-        RegisterUserResponse response = userService.register(registerUserRequest);
+            @RequestBody @Valid RegisterUserRequest registerRequest) {
+
+        var response = userService.register(registerRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.<RegisterUserResponse>builder()
-                        .data(response)
-                        .success(true)
-                        .message("User registered successfully")
-                        .build());
+                .body(ApiResponse.success(response, "User registered successfully"));
     }
 
     @PutMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserResponseDTO>> updateProfile(
             @PathVariable Long userId,
-            @Valid @RequestBody UserUpdateDTO dto
-    ) {
-        UserResponseDTO response = userService.updateProfile(userId, dto);
-        return ResponseEntity.ok(
-                ApiResponse.<UserResponseDTO>builder()
-                        .data(response)
-                        .success(true)
-                        .message("User profile updated successfully")
-                        .build()
-        );
+            @RequestBody @Valid UserUpdateDTO updateDTO) {
+
+        var response = userService.updateProfile(userId, updateDTO);
+        return ResponseEntity.ok(ApiResponse.success(response, "User profile updated successfully"));
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> getAllUsers(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+        Page<UserResponseDTO> users = userService.getAll(pageable);
+        return ResponseEntity.ok(ApiResponse.success(users, "All users fetched with pagination"));
+    }
+
 }
+

@@ -91,6 +91,11 @@
             <version>6.3.3</version> <!-- Match your Spring Boot version (3.3.4 = Spring Security 6.3.3) -->
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.33.0</version>
+        </dependency>
 
 
         <dependency>

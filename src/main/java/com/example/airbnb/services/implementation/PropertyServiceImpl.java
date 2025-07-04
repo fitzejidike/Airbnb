@@ -7,6 +7,7 @@ import com.example.airbnb.data.repository.UserRepository;
 import com.example.airbnb.dtos.request.PropertyRequestDTO;
 import com.example.airbnb.dtos.responses.PropertyResponseDTO;
 import com.example.airbnb.exception.UserNotFoundException;
+import com.example.airbnb.services.FileStorageService;
 import com.example.airbnb.services.PropertyService;
 import com.example.airbnb.services.serviceUtils.PropertyMapper;
 import jakarta.persistence.EntityNotFoundException;

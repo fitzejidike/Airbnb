@@ -14,9 +14,13 @@ import com.example.airbnb.services.UserService;
 import com.example.airbnb.services.serviceUtils.UserValidators;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -76,6 +80,13 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toResponseDTO(userRepository.save(user));
 
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public Page<UserResponseDTO> getAll(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(UserMapper::toResponseDTO);
+    }
+
 
 
 }

@@ -32,4 +32,5 @@ public class PropertyRequestDTO {
 
     @NotNull(message = "Host ID is required")
     private Long hostId;
+    private Boolean available;
 }
