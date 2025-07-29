@@ -6,11 +6,11 @@ import com.example.airbnb.data.repository.PropertyRepository;
 import com.example.airbnb.data.repository.UserRepository;
 import com.example.airbnb.dtos.request.PropertyRequestDTO;
 import com.example.airbnb.dtos.responses.PropertyResponseDTO;
+import com.example.airbnb.exception.PropertyNotFoundException;
 import com.example.airbnb.exception.UserNotFoundException;
 import com.example.airbnb.services.FileStorageService;
 import com.example.airbnb.services.PropertyService;
 import com.example.airbnb.services.serviceUtils.PropertyMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class PropertyServiceImpl implements PropertyService {
     public PropertyResponseDTO getProperty(Long id) {
         return propertyRepository.findById(id)
                 .map(PropertyMapper::toResponseDTO)
-                .orElseThrow(() -> new EntityNotFoundException("Property not found"));
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found"));
     }
 
     @Override

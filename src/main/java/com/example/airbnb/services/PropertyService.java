@@ -1,9 +1,7 @@
 package com.example.airbnb.services;
 
 import com.example.airbnb.dtos.request.PropertyRequestDTO;
-import com.example.airbnb.dtos.request.RegisterPropertyRequest;
 import com.example.airbnb.dtos.responses.PropertyResponseDTO;
-import com.example.airbnb.dtos.responses.RegisterPropertyResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

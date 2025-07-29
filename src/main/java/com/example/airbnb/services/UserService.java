@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserService {
  RegisterUserResponse register(RegisterUserRequest request);
-    UserResponseDTO updateProfile(Long userId, UserUpdateDTO dto);
+     public UserResponseDTO updateProfile(Long userId, UserUpdateDTO dto);
     User getUserById(Long userId);
     Page<UserResponseDTO> getAll(Pageable pageable);
 
