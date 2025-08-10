@@ -41,6 +41,10 @@ public class User {
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Property> properties = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.GUEST;
+
+
     @PrePersist
     protected void onCreate() {
         this.timeCreated = LocalDateTime.now();

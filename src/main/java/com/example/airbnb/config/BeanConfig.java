@@ -1,4 +1,4 @@
-package com.example.airbnb.security.config;
+package com.example.airbnb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
