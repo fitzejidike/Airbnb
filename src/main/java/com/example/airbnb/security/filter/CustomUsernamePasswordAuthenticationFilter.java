@@ -3,7 +3,7 @@
 //import com.auth0.jwt.JWT;
 //import com.auth0.jwt.algorithms.Algorithm;
 //import com.example.airbnb.dtos.request.LoginRequest;
-//import com.example.airbnb.dtos.responses.BaseResponse;
+//import com.example.airbnb.dtos.responses.ApiResponse;
 //import com.example.airbnb.dtos.responses.LoginResponse;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import jakarta.servlet.FilterChain;
@@ -93,7 +93,7 @@
 //    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 //        LoginResponse loginResponse = new LoginResponse();
 //        loginResponse.setMessage(failed.getMessage());
-//        BaseResponse<LoginResponse> baseResponse = new BaseResponse<>();
+//        ApiResponse<LoginResponse> baseResponse = new ApiResponse<>();
 //        baseResponse.setData(loginResponse);
 //        baseResponse.setStatus(false);
 //        baseResponse.setCode(HttpStatus.UNAUTHORIZED.value());
