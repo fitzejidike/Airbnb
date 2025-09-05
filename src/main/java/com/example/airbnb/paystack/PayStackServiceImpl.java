@@ -102,7 +102,7 @@ public class PayStackServiceImpl implements PayStackService {
                 null);
     }
 
-    // ---------- PRIVATE HELPERS ---------- //
+    
     private PaymentResponse parsePaymentResponse(String jsonResponse, boolean isPayment) {
         JSONObject json = new JSONObject(jsonResponse);
 
