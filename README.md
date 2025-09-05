@@ -21,7 +21,17 @@ A modular, scalable, and production-ready backend system for managing properties
 - Register, update profile, and manage account settings
 - JWT-based authentication
 - Role-based authorization (guest, host, admin)
+  
+### ✅ Payments (via Paystack)
 
+- Initiate payments for bookings using Paystack APIs
+- Verify transactions securely
+- Transfers support (e.g., payout to hosts)
+- Resilience features with Resilience4j:
+- @Retry for automatic retries when Paystack APIs fail
+- @CircuitBreaker for graceful fallbacks if the API is down
+- Fallback Responses return user-friendly messages when Paystack cannot be reached
+- 
 ### ✅ Messaging & Notification (Upcoming)
 - Email notifications for bookings (SMTP/JavaMailSender)
 - Kafka pipeline for asynchronous event handling
