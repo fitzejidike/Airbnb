@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 @RestController
-@RequestMapping("/api/properties")
+@RequestMapping("/api/v1/properties")
 @RequiredArgsConstructor
 public class PropertyController {
 

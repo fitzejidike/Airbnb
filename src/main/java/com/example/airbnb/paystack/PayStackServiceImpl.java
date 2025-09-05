@@ -1,206 +1,133 @@
-//package com.example.airbnb.paystack;
-//
-//import com.example.airbnb.config.PayStackConfig;
-//import com.example.airbnb.dtos.request.PaymentRequest;
-//import com.example.airbnb.dtos.request.TransferRequest;
-//import com.example.airbnb.dtos.responses.PayStackData;
-//import com.example.airbnb.dtos.responses.PaymentResponse;
-//import com.nimbusds.oauth2.sdk.Response;
-//import net.minidev.json.JSONObject;
-//import okhttp3.FormBody;
-//import okhttp3.OkHttpClient;
-//import okhttp3.Request;
-//import okhttp3.RequestBody;
-//import org.springframework.http.HttpEntity;
-//import org.springframework.http.HttpHeaders;
-//import org.springframework.http.HttpMethod;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.client.RestTemplate;
-//
-//
-//import java.io.IOException;
-//
-//public class PayStackServiceImpl implements PayStackService {
-//    private  final PayStackConfig payStackConfig;
-//    private final OkHttpClient client = new OkHttpClient();
-//
-//    public PayStackServiceImpl(PayStackConfig payStackConfig) {
-//        this.payStackConfig = payStackConfig;
-//    }
-//    @Override
-//    public PaymentResponse initiatePayment(PaymentRequest paymentRequest) {
-//        // Validate request
-//        if (paymentRequest.getAmount() <= 0 || paymentRequest.getEmail() == null) {
-//            throw new IllegalArgumentException("Invalid payment request");
-//        }
-//
-//        // Build request body
-//        RequestBody requestBody = new FormBody.Builder()
-//                .add("amount", String.valueOf(paymentRequest.getAmount()))
-//                .add("email", paymentRequest.getEmail())
-//                .build();
-//
-//        // Build HTTP request
-//        Request request = new Request.Builder()
-//                .url(payStackConfig.getPayStackInitiatePaymentUrl())
-//                .header("Authorization", "Bearer " + payStackConfig.getPayStackSecretKey())
-//                .post(requestBody)
-//                .build();
-//
-//        // Execute request
-//        try (Response response = client.newCall(request).execute()) {
-//            if (!response.isSuccessful()) {
-//                throw new RuntimeException("HTTP Error: " + response.code() + " - " + response.message());
-//            }
-//
-//            String jsonResponse = response.body() != null ? response.body().string() : "";
-//            JSONObject jsonObject = new JSONObject(jsonResponse);
-//
-//            // Parse response
-//            boolean status = jsonObject.getBoolean("status");
-//            String message = jsonObject.getString("message");
-//            JSONObject data = jsonObject.optJSONObject("data");
-//
-//            if (data == null) {
-//                throw new JSONException("Missing 'data' in response");
-//            }
-//
-//            PayStackData paystackData = new PayStackData();
-//            paystackData.setAuthorizationUrl(data.getString("authorization_url"));
-//            paystackData.setAccessCode(data.getString("access_code"));
-//            paystackData.setReference(data.getString("reference"));
-//
-//            PaymentResponse paymentResponse = new PaymentResponse();
-//            paymentResponse.setStatus(status);
-//            paymentResponse.setMessage(message);
-//            paymentResponse.setData(paystackData);
-//
-//            return paymentResponse;
-//        } catch (IOException e) {
-//            throw new RuntimeException("IO Error during payment initiation", e);
-//        } catch (JSONException e) {
-//            throw new RuntimeException("JSON Parsing Error", e);
-//        }
-//    }
-//
-//
-//    @Override
-//    public PaymentResponse verifyPayment(String reference) {
-//        Request request = new Request.Builder()
-//                .url(payStackConfig.getPayStackVerifyPaymentUrl() + reference)
-//                .header("Authorization", "Bearer "
-//                        + payStackConfig.getPayStackSecretKey())
-//                .build();
-//
-//        try (Response response = client.newCall(request).execute()) {
-//            String jsonResponse = response.body().string();
-//            JSONObject jsonObject = new JSONObject(jsonResponse);
-//
-//            boolean status = jsonObject.getBoolean("status");
-//            String message = jsonObject.getString("message");
-//            JSONObject data = jsonObject.getJSONObject("data");
-//
-//            PayStackData paystackData = new PayStackData();
-//            paystackData.setAuthorizationUrl(data.getString("authorization_url"));
-//            paystackData.setAccessCode(data.getString("access_code"));
-//            paystackData.setReference(data.getString("reference"));
-//
-//            PaymentResponse paymentResponse = new PaymentResponse();
-//            paymentResponse.setStatus(status);
-//            paymentResponse.setMessage(message);
-//            paymentResponse.setData(paystackData);
-//
-//            return paymentResponse;
-//        } catch (IOException | JSONException e) {
-//            throw new RuntimeException("Error verifying payment", e);
-//        }
-//    }
-//
-//    @Override
-//    public PaymentResponse initiateTransfer(TransferRequest transferRequest) {
-//        return null;
-//    }
-//
-//    @Override
-//    public PaymentResponse initiateTransfer(TransferRequest transferRequest) {
-//            RequestBody requestBody = new FormBody.Builder()
-//                    .add("source", "balance")
-//                    .add("amount", String.valueOf(transferRequest.getAmount()))
-//                    .add("recipient", transferRequest.getRecipientCode())
-//                    .add("reason", transferRequest.getReason())
-//                    .build();
-//
-//            Request request = new Request.Builder()
-//                    .url(payStackConfig.getTransferUrl())
-//                    .header("Authorization", "Bearer "
-//                            + payStackConfig.getPayStackSecretKey())
-//                    .post(requestBody)
-//                    .build();
-//
-//            try (Response response = client.newCall(request).execute()) {
-//                String jsonResponse = response.body().string();
-//                JSONObject jsonObject = new JSONObject(jsonResponse);
-//
-//                boolean status = jsonObject.getBoolean("status");
-//                String message = jsonObject.getString("message");
-//                JSONObject data = jsonObject.getJSONObject("data");
-//
-//                PayStackData paystackData = new PayStackData();
-//                paystackData.setTransferCode(data.getString("transfer_code"));
-//                paystackData.setReference(data.getString("reference"));
-//
-//                PaymentResponse paymentResponse = new PaymentResponse();
-//                paymentResponse.setStatus(status);
-//                paymentResponse.setMessage(message);
-//                paymentResponse.setData(paystackData);
-//
-//                return paymentResponse;
-//            } catch (IOException | JSONException e) {
-//                throw new RuntimeException("Error initiating transfer", e);
-//            }
-//    }
-//
-//    @Override
-//    public PaymentResponse verifyTransfer(String reference) {
-//        Request request = new Request.Builder()
-//                .url(payStackConfig.getPayStackVerifyPaymentUrl() + reference)
-//                .header("Authorization", "Bearer "
-//                        + payStackConfig.getPayStackSecretKey())
-//                .build();
-//
-//        try (Response response = client.newCall(request).execute()) {
-//            String jsonResponse = response.body().string();
-//            JSONObject jsonObject = new JSONObject(jsonResponse);
-//
-//            boolean status = jsonObject.getBoolean("status");
-//            String message = jsonObject.getString("message");
-//            JSONObject data = jsonObject.getJSONObject("data");
-//
-//            PayStackData paystackData = new PayStackData();
-//            paystackData.setTransferCode(data.getString("transfer_code"));
-//            paystackData.setReference(data.getString("reference"));
-//
-//            PaymentResponse paymentResponse = new PaymentResponse();
-//            paymentResponse.setStatus(status);
-//            paymentResponse.setMessage(message);
-//            paymentResponse.setData(paystackData);
-//
-//            return paymentResponse;
-//        } catch (IOException|JSONException e) {
-//            throw new RuntimeException("Error verifying transfer", e);
-//        }
-//    }
-//    @Override
-//    public String getBanks() {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + payStackConfig.getPayStackSecretKey());
-//        HttpEntity<String> entity = new HttpEntity<>(headers);
-//
-//        RestTemplate restTemplate = new RestTemplate();
-//        ResponseEntity<String> response = restTemplate.exchange(
-//                "https://api.paystack.co/bank", HttpMethod.GET, entity, String.class);
-//
-//        return response.getBody();
-//    }
-//
-//}
+package com.example.airbnb.paystack;
+
+
+import com.example.airbnb.dtos.request.PaymentRequest;
+import com.example.airbnb.dtos.request.TransferRequest;
+import com.example.airbnb.dtos.responses.PayStackData;
+import com.example.airbnb.dtos.responses.PaymentResponse;
+import com.example.airbnb.exception.PayStackException;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+@Service
+@RequiredArgsConstructor
+public class PayStackServiceImpl implements PayStackService {
+
+    private final PayStackConfig payStackConfig;
+    private final PayStackHttpClient httpClient;
+
+    @Override
+    @Retry(name = "paystack", fallbackMethod = "fallbackPayment")
+    @CircuitBreaker(name = "paystack", fallbackMethod = "fallbackPayment")
+    public PaymentResponse initiatePayment(PaymentRequest paymentRequest) {
+        if (paymentRequest.getAmount() <= 0 || paymentRequest.getEmail() == null) {
+            throw new IllegalArgumentException("Invalid payment request");
+        }
+
+        RequestBody body = new FormBody.Builder()
+                .add("amount", String.valueOf(paymentRequest.getAmount()))
+                .add("email", paymentRequest.getEmail())
+                .build();
+
+        String response = httpClient.post(payStackConfig.getInitiatePaymentUrl(), body);
+        return parsePaymentResponse(response, true);
+    }
+
+
+    @Override
+    @Retry(name = "paystack", fallbackMethod = "fallbackVerifyPayment")
+    @CircuitBreaker(name = "paystack", fallbackMethod = "fallbackVerifyPayment")
+    public PaymentResponse verifyPayment(String reference) {
+        String response = httpClient.get(payStackConfig.getVerifyPaymentUrl() + reference);
+        return parsePaymentResponse(response, true);
+    }
+
+
+    @Override
+    @Retry(name = "paystack", fallbackMethod = "fallbackTransfer")
+    @CircuitBreaker(name = "paystack", fallbackMethod = "fallbackTransfer")
+    public PaymentResponse initiateTransfer(TransferRequest transferRequest) {
+        RequestBody body = new FormBody.Builder()
+                .add("source", "balance")
+                .add("amount", String.valueOf(transferRequest.getAmount()))
+                .add("recipient", transferRequest.getRecipientCode())
+                .add("reason", transferRequest.getReason())
+                .build();
+
+        String response = httpClient.post(payStackConfig.getTransferUrl(), body);
+        return parsePaymentResponse(response, false);
+    }
+
+
+    @Override
+    @Retry(name = "paystack", fallbackMethod = "fallbackVerifyTransfer")
+    @CircuitBreaker(name = "paystack", fallbackMethod = "fallbackVerifyTransfer")
+    public PaymentResponse verifyTransfer(String reference) {
+        String response = httpClient.get(payStackConfig.getVerifyTransferUrl() + reference);
+        return parsePaymentResponse(response, false);
+    }
+
+
+    @Override
+    public String getBanks() {
+        return httpClient.get(payStackConfig.getBanksUrl());
+    }
+
+
+    public PaymentResponse fallbackPayment(PaymentRequest request, Throwable t) {
+        return new PaymentResponse(false,
+                "Fallback: Could not initiate payment. Reason: " + t.getMessage(),
+                null);
+    }
+
+    public PaymentResponse fallbackVerifyPayment(String reference, Throwable t) {
+        return new PaymentResponse(false,
+                "Fallback: Could not verify payment for ref=" + reference + ". Reason: " + t.getMessage(),
+                null);
+    }
+
+    public PaymentResponse fallbackTransfer(TransferRequest transferRequest, Throwable t) {
+        return new PaymentResponse(false,
+                "Fallback: Could not initiate transfer. Reason: " + t.getMessage(),
+                null);
+    }
+
+    public PaymentResponse fallbackVerifyTransfer(String reference, Throwable t) {
+        return new PaymentResponse(false,
+                "Fallback: Could not verify transfer for ref=" + reference + ". Reason: " + t.getMessage(),
+                null);
+    }
+
+    // ---------- PRIVATE HELPERS ---------- //
+    private PaymentResponse parsePaymentResponse(String jsonResponse, boolean isPayment) {
+        JSONObject json = new JSONObject(jsonResponse);
+
+        boolean status = json.getBoolean("status");
+        String message = json.getString("message");
+        JSONObject data = json.optJSONObject("data");
+
+        if (data == null) {
+            throw new PayStackException("Missing 'data' in Paystack response");
+        }
+
+        PayStackData paystackData = new PayStackData();
+        if (isPayment) {
+            paystackData.setAuthorizationUrl(data.optString("authorization_url", null));
+            paystackData.setAccessCode(data.optString("access_code", null));
+        } else {
+            paystackData.setTransferCode(data.optString("transfer_code", null));
+        }
+        paystackData.setReference(data.optString("reference", null));
+
+        PaymentResponse paymentResponse = new PaymentResponse();
+        paymentResponse.setStatus(status);
+        paymentResponse.setMessage(message);
+        paymentResponse.setData(paystackData);
+
+        return paymentResponse;
+    }
+}

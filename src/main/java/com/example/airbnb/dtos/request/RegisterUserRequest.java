@@ -1,16 +1,18 @@
 package com.example.airbnb.dtos.request;
 
 import com.example.airbnb.data.model.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class RegisterUserRequest {
-    private String name;
-    private String email;
-    private String username;
-    private String password;
+    @NotBlank private String name;
+    @NotBlank private String email;
+    @Email private String username;
+    @NotBlank private String password;
     private Role role;
 
 

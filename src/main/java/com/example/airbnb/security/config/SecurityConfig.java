@@ -5,8 +5,6 @@
 //import org.springframework.context.annotation.Configuration;
 //import org.springframework.security.authentication.AuthenticationManager;
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
-//import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 //import org.springframework.security.web.SecurityFilterChain;
 //import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 //
@@ -20,7 +18,8 @@
 //
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        var authenticationFilter = new CustomUsernamePasswordAuthenticationFilter(authenticationManager);
+//        var authenticationFilter =
+//                new CustomUsernamePasswordAuthenticationFilter(authenticationManager);
 //        authenticationFilter.setFilterProcessesUrl("/api/v1/auth");
 //        return http.csrf(c->c.disable())
 //                .cors(c->c.disable())
