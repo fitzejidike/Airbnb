@@ -1,5 +1,6 @@
 package com.example.airbnb.security.filter;
 
+import com.example.airbnb.exception.InvalidTokenException;
 import com.example.airbnb.security.services.CustomUserDetailsService;
 import com.example.airbnb.security.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -42,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
-            } catch (Exception ex) {
+            } catch (InvalidTokenException ex) {
                 // invalid token — don't set auth, just continue (optionally log)
             }
         }
