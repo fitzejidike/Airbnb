@@ -1,5 +1,6 @@
 package com.example.airbnb.paystack;
 import lombok.Getter;
+import lombok.Setter;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ConfigurationProperties(prefix = "paystack")
+@Setter
 @Getter
 public class PayStackConfig {
     private String baseUrl;
