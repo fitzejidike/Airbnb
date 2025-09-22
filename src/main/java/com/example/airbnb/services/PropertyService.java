@@ -10,6 +10,6 @@ public interface PropertyService {
     PropertyResponseDTO createProperty(PropertyRequestDTO dto, MultipartFile image);
     PropertyResponseDTO getProperty(Long id);
     List<PropertyResponseDTO> getPropertiesByHost(Long hostId);
-    void deleteProperty(Long id);
+    void deleteProperty(Long propertyId, String currentUsername);
 }
 

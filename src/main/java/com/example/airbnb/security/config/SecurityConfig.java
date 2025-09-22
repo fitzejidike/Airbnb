@@ -6,6 +6,7 @@ import com.example.airbnb.security.services.CustomUserDetailsService;
 import com.example.airbnb.security.utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -38,6 +39,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll() // Allow login and OAuth endpoints
+                        .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/properties/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/properties").hasRole("HOST")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/properties/**").hasRole("HOST")
+
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // Require auth for all other endpoints
                 )
                 .addFilter(authenticationFilter)

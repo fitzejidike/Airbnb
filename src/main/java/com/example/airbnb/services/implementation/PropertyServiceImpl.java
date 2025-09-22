@@ -6,6 +6,7 @@ import com.example.airbnb.data.repository.PropertyRepository;
 import com.example.airbnb.data.repository.UserRepository;
 import com.example.airbnb.dtos.request.PropertyRequestDTO;
 import com.example.airbnb.dtos.responses.PropertyResponseDTO;
+import com.example.airbnb.exception.AssetDeletionDeniedException;
 import com.example.airbnb.exception.PropertyNotFoundException;
 import com.example.airbnb.exception.UserNotFoundException;
 import com.example.airbnb.services.FileStorageService;
@@ -14,6 +15,7 @@ import com.example.airbnb.services.serviceUtils.PropertyMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -62,7 +64,20 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void deleteProperty(Long id) {
-        propertyRepository.deleteById(id);
+    @Transactional
+    public void deleteProperty(Long propertyId, String currentUsername) {
+        var property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found"));
+
+        // Find current logged-in user
+        var user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Ownership check: only the host who owns this property can delete
+        if (!property.getHost().getId().equals(user.getId())) {
+            throw new AssetDeletionDeniedException("You are not allowed to delete this property");
+        }
+
+        propertyRepository.delete(property);
     }
 }

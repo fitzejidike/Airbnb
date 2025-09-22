@@ -182,7 +182,7 @@ class PropertyServiceImplTest {
     void deleteProperty_DeletesById() {
         Long id = 10L;
 
-        propertyService.deleteProperty(id);
+        propertyService.deleteProperty(id, );
 
         verify(propertyRepository).deleteById(id);
     }
