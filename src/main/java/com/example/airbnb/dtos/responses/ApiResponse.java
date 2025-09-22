@@ -1,6 +1,7 @@
 package com.example.airbnb.dtos.responses;
 
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 @Setter
 @Getter
@@ -11,9 +12,9 @@ public class ApiResponse<T> {
     private T data;
     private boolean success;
     private String message;
-    private int code; // Added to match filter's usage
+    private int code;
 
-    // Static factory for success responses
+    // ✅ Success (with data, message, and code)
     public static <T> ApiResponse<T> success(T data, String message, int code) {
         return ApiResponse.<T>builder()
                 .data(data)
@@ -23,10 +24,25 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    // Static factory for failures
+    // ✅ Success (defaults to 200 OK)
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return success(data, message, 200);
+    }
+
+    //  Failure (just message, defaults to 400)
+    public static <T> ApiResponse<T> failure(String message) {
+        return failure(null, message, 400);
+    }
+
+    //  Failure (just message, custom code)
     public static <T> ApiResponse<T> failure(String message, int code) {
+        return failure(null, message, code);
+    }
+
+    // ✅ Failure (with data, e.g., validation errors)
+    public static <T> ApiResponse<T> failure(T data, String message, int code) {
         return ApiResponse.<T>builder()
-                .data(null)
+                .data(data)
                 .success(false)
                 .message(message)
                 .code(code)
