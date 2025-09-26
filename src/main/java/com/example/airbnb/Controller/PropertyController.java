@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 @RestController
 @RequestMapping("/api/v1/properties")
@@ -43,9 +44,10 @@ public class PropertyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteProperty(@PathVariable Long id) {
-        propertyService.deleteProperty(id, );
+    public ResponseEntity<ApiResponse<String>> deleteProperty(@PathVariable Long id, Principal principal) {
+        propertyService.deleteProperty(id, principal.getName()); // ownership enforced
         return ResponseEntity.ok(ApiResponse.success("Deleted successfully", "Property deleted successfully"));
     }
+
 }
 

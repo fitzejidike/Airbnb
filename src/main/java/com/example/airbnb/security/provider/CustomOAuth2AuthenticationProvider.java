@@ -1,5 +1,9 @@
 package com.example.airbnb.security.provider;
 
+import com.example.airbnb.data.model.Role;
+import com.example.airbnb.data.model.User;
+import com.example.airbnb.data.repository.UserRepository;
+import com.example.airbnb.security.model.CustomUserDetails;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -24,6 +28,8 @@ public class CustomOAuth2AuthenticationProvider implements AuthenticationProvide
     // Replace with your Google OAuth2 Client ID
     private static final String CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
 
+    private final UserRepository userRepository;  // ✅ Inject repo so we can fetch/create user
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String idTokenString = authentication.getCredentials().toString();
@@ -43,8 +49,25 @@ public class CustomOAuth2AuthenticationProvider implements AuthenticationProvide
                 String email = payload.getEmail();
                 String name = (String) payload.get("name");
 
-                // Here you can check if user exists in DB, or auto-register them
-                return new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                // ✅ Step 1: Check DB if user exists
+                User user = userRepository.findByEmail(email)
+                        .orElseGet(() -> {
+                            // Auto-register new user if not found
+                            User newUser = User.builder()
+                                    .email(email)
+                                    .name(name)
+                                    .username(email.split("@")[0]) // simple default username
+                                    .role(Role.GUEST)
+                                    .build();
+                            return userRepository.save(newUser);
+                        });
+
+                // ✅ Step 2: Wrap into CustomUserDetails
+                CustomUserDetails userDetails = new CustomUserDetails(user);
+
+                // ✅ Step 3: Return authenticated token with proper principal
+                return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
             } else {
                 throw new BadCredentialsException("Invalid Google ID Token");
             }
@@ -57,4 +80,5 @@ public class CustomOAuth2AuthenticationProvider implements AuthenticationProvide
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
+
 }

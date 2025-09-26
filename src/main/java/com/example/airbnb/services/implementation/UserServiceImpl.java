@@ -44,8 +44,8 @@ public class UserServiceImpl implements UserService {
                 request,
                 passwordEncoder.encode(request.getPassword())
         );
-
-        return UserMapper.toRegisterResponse(user);
+        User savedUser = userRepository.save(user);
+        return UserMapper.toRegisterResponse(savedUser);
     }
 
 

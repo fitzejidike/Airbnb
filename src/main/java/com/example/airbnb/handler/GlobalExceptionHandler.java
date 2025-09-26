@@ -4,6 +4,7 @@ import com.example.airbnb.dtos.responses.ApiResponse;
 import com.example.airbnb.exception.GlobalException;
 import com.example.airbnb.exception.InvalidEmailFoundException;
 import com.example.airbnb.exception.InvalidPasswordException;
+import com.example.airbnb.exception.UserAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleUsernameNotFound(UsernameNotFoundException ex) {
         return error(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<?>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT) // 409
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .code(HttpStatus.CONFLICT.value())
+                        .build());
+    }
+
 
     @ExceptionHandler(GlobalException.class)
     public ResponseEntity<ApiResponse<String>> handleGlobal(GlobalException ex) {
